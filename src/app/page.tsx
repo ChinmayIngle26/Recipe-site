@@ -1,11 +1,11 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
 import RecipeCard from "@/components/RecipeCard";
 import SearchBar from "@/components/SearchBar";
 import CategoryFilter from "@/components/CategoryFilter";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { getFeaturedRecipes, getRecipesByCategory, recipes } from "@/data/recipes";
 
 const fadeUp = {
@@ -29,6 +29,15 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const featured = getFeaturedRecipes();
   const filtered = getRecipesByCategory(selectedCategory);
+
+  const targetRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start end", "end start"],
+  });
+
+  const x1 = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
+  const x2 = useTransform(scrollYProgress, [0, 1], ["-20%", "0%"]);
 
   const stats = [
     { label: "Recipes", value: `${recipes.length}+` },
@@ -173,6 +182,49 @@ export default function HomePage() {
               <RecipeCard key={recipe.id} recipe={recipe} index={i} />
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ====== HORIZONTAL PARALLAX SCROLL ====== */}
+      <section ref={targetRef} className="py-16 sm:py-24 overflow-hidden bg-[var(--background)]">
+        <div className="flex flex-col gap-4 sm:gap-8">
+          <motion.div style={{ x: x1 }} className="flex whitespace-nowrap gap-4 sm:gap-8 items-center">
+            {[...Array(4)].map((_, i) => (
+              <div key={`row1-${i}`} className="flex gap-4 sm:gap-8 items-center shrink-0">
+                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-warm-500 drop-shadow-sm">
+                  TASTECRAFT
+                </span>
+                <span className="text-3xl sm:text-5xl text-[var(--muted)]/40">✦</span>
+                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-[var(--foreground)] drop-shadow-sm">
+                  DELICIOUS
+                </span>
+                <span className="text-3xl sm:text-5xl text-[var(--muted)]/40">✦</span>
+                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-transparent" style={{ WebkitTextStroke: "2px var(--muted)", opacity: 0.6 }}>
+                  RECIPES
+                </span>
+                <span className="text-3xl sm:text-5xl text-[var(--muted)]/40">✦</span>
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div style={{ x: x2 }} className="flex whitespace-nowrap gap-4 sm:gap-8 items-center -ml-[20%]">
+            {[...Array(4)].map((_, j) => (
+              <div key={`row2-${j}`} className="flex gap-4 sm:gap-8 items-center shrink-0">
+                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-transparent" style={{ WebkitTextStroke: "2px var(--muted)", opacity: 0.6 }}>
+                  COOKING
+                </span>
+                <span className="text-3xl sm:text-5xl text-[var(--muted)]/40">✦</span>
+                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-[var(--foreground)] drop-shadow-sm">
+                  PASSION
+                </span>
+                <span className="text-3xl sm:text-5xl text-[var(--muted)]/40">✦</span>
+                <span className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-warm-500 to-primary-400 drop-shadow-sm">
+                  INSPIRATION
+                </span>
+                <span className="text-3xl sm:text-5xl text-[var(--muted)]/40">✦</span>
+              </div>
+            ))}
+          </motion.div>
         </div>
       </section>
 
